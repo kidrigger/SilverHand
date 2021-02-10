@@ -1,0 +1,5 @@
+{
+  "user_registry": "user_registry.json",
+  "character_registry": "character_registry.json",
+  "character_sheet_directory" :  "characters"
+}

@@ -17,13 +17,12 @@ namespace SilverHand.Core
 			{
 				Directory.CreateDirectory(rootDirectory);
 			}
-			characterRepo = new ();
+			characterRepo = new Dictionary<CharacterId, CharacterSheet>();
 		}
 
 		public CharacterSheet? Get(CharacterId character)
 		{
-			bool v = characterRepo.TryGetValue(character, out CharacterSheet? value);
-			return v ? value : null;
+			return characterRepo.TryGetValue(character, out var value) ? value : null;
 		}
 
 		public void AddCharacter(CharacterId character)
@@ -37,12 +36,9 @@ namespace SilverHand.Core
 			}
 		}
 
-		public bool DeleteCharacter(CharacterId character)
+		public void DeleteCharacter(CharacterId character)
 		{
-			if (!characterRepo.Remove(character)) return false;
-
-			File.Delete($"{rootDirectory}/{character.Key}.json");
-			return true;
+			if (characterRepo.Remove(character)) File.Delete($"{rootDirectory}/{character.Key}.json");
 		}
 
 		public static async Task<CharacterSheetRepo> LoadAsync(string rootDir, IEnumerable<CharacterId> characters)

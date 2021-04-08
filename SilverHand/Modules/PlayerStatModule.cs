@@ -167,9 +167,9 @@ namespace SilverHand.Modules
 
 				var statValue = charSheet.GetStat(stat);
 				var skillValue = charSheet.GetSkill(skill);
-				var roll = (int)DiceRoller.Roll(new DiceRoll(1, 10, skillValue + statValue));
+				var roll = (int)DiceRoller.Roll(new DiceRoll(1, 10));
 
-				return ReplyAsync($"{charSheet.Handle}'s {skill} roll : [1d10 ({roll}) + {stat} ({statValue}) + {skill} ({skillValue})] => **`{roll}`**");
+				return ReplyAsync($"{charSheet.Handle}'s {skill} roll : [1d10 ({roll}) + {stat} ({statValue}) + {skill} ({skillValue})] => **`{roll + skillValue + statValue}`**");
 			}
 			catch (Exception e)
 			{

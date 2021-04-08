@@ -27,23 +27,15 @@ namespace SilverHand.Modules
 		{
 			var user = Context.Message.Author;
 			var nick = Context.Guild.GetUser(user.Id).Nickname;
-			if (!CharacterManager.Instance.DeregisterUser(user))
-			{
-				return ReplyAsync($"{nick} `({user.Username}#{user.Discriminator})` is not registered.");
-			}
-			return Task.WhenAll(CharacterManager.StoreCharacterManager(), ReplyAsync($"{nick} `({user.Username}#{user.Discriminator})` deregistered."));
+			return !CharacterManager.Instance.DeregisterUser(user) ? ReplyAsync($"{nick} `({user.Username}#{user.Discriminator})` is not registered.") : Task.WhenAll(CharacterManager.StoreCharacterManager(), ReplyAsync($"{nick} `({user.Username}#{user.Discriminator})` deregistered."));
 		}
 
 		[Command("players")]
 		[Summary("Lists the registered players in the server")]
 		public Task ListUsersAsync()
 		{
-			var users = from userId in CharacterManager.Instance.RegisteredUsers select $"\n - {Context.Guild.GetUser(userId).Nickname}";
-			if (users == null || !users.Any())
-			{
-				return ReplyAsync("No users registered");
-			}
-			return ReplyAsync(string.Join(string.Empty, users));
+			var users = (from userId in CharacterManager.Instance.RegisteredUsers select $"\n - {Context.Guild.GetUser(userId).Nickname}").ToList();
+			return ReplyAsync(users.Count == 0 ? "No users registered" : string.Join(string.Empty, users));
 		}
 	}
 }

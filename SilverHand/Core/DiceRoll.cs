@@ -1,17 +1,19 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord.Commands;
+using SilverHand.Utils;
 
 namespace SilverHand.Core
 {
 	public static class DiceRoller {
-		private readonly static Random rng = new Random();
+		private static readonly Random rng = new Random();
 
 		public static long Roll(DiceRoll dice)
 		{
 			long total = 0;
-			for (int i = 0; i < dice.Count; ++i)
+			foreach (var _ in ..dice.Count)
 			{
 				total += rng.Next(dice.Dice) + 1;
 			}
@@ -22,13 +24,13 @@ namespace SilverHand.Core
 		{
 			StringBuilder sb = new("[");
 			long total = 0;
-			for (int i = 0; i < dice.Count; ++i)
+			foreach (var i in ..dice.Count)
 			{
 				var v = (rng.Next(dice.Dice) + 1);
 				sb.Append($"{(i == 0 ? string.Empty : "+")}{v}");
 				total += v;
 			}
-			sb.Append($"]");
+			sb.Append("]");
 			if (dice.Modifier != 0)
 			{
 				sb.Append($" {dice.Sign} {Math.Abs(dice.Modifier)}");
@@ -40,10 +42,10 @@ namespace SilverHand.Core
 
 	public struct DiceRoll
 	{
-		public int Count { get; init; }
-		public int Dice { get; init; }
-		public int Modifier { get; init; }
-		public char Sign { get => Modifier > 0 ? '+' : '-'; }
+		public int Count { get; private init; }
+		public int Dice { get; private init; }
+		public int Modifier { get; private init; }
+		public char Sign => Modifier > 0 ? '+' : '-';
 
 		public DiceRoll(int dice) : this(1, dice) { }
 
@@ -58,22 +60,22 @@ namespace SilverHand.Core
 		
 		public static bool TryParse(string s, out DiceRoll diceRoll)
 		{
-			diceRoll = new DiceRoll { };
-			int count = 1;
+			diceRoll = new DiceRoll();
+			var count = 1;
 			s = s.ToLower().Trim();
-			int dIdx = s.IndexOf('d');
-			if (int.TryParse(s[..dIdx].Trim(), out int countResult))
+			var dIdx = s.IndexOf('d');
+			if (int.TryParse(s[..dIdx].Trim(), out var countResult))
 			{
 				count = countResult;
 			}
 			s = s[(dIdx + 1)..];
-			int mIdx = Math.Max(s.IndexOf('+'), s.IndexOf('-'));
+			var mIdx = Math.Max(s.IndexOf('+'), s.IndexOf('-'));
 			int dice;
 			int mod;
 			if (mIdx < 0)
 			{
 				mod = 0;
-				if (int.TryParse(s.Trim(), out int diceResult))
+				if (int.TryParse(s.Trim(), out var diceResult))
 				{
 					dice = diceResult;
 				}
@@ -84,7 +86,7 @@ namespace SilverHand.Core
 			}
 			else
 			{
-				if (int.TryParse(s[..mIdx].Trim(), out int diceResult))
+				if (int.TryParse(s[..mIdx].Trim(), out var diceResult))
 				{
 					dice = diceResult;
 				}
@@ -93,7 +95,7 @@ namespace SilverHand.Core
 					return false;
 				}
 
-				if (int.TryParse(s[(mIdx + 1)..].Trim(), out int modResult))
+				if (int.TryParse(s[(mIdx + 1)..].Trim(), out var modResult))
 				{
 					mod = s[mIdx] == '+' ? modResult : -modResult;
 				}
@@ -118,7 +120,7 @@ namespace SilverHand.Core
 	{
 		public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
 		{
-			if (DiceRoll.TryParse(input, out DiceRoll result))
+			if (DiceRoll.TryParse(input, out var result))
 			{
 				return Task.FromResult(TypeReaderResult.FromSuccess(result));
 			}

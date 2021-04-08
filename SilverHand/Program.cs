@@ -26,6 +26,12 @@ namespace SilverHand
 			config = JsonConvert.DeserializeObject<ConfigFile>(reader.ReadToEnd());
 		}
 
+        private static async Task<string> GetTokenAsync()
+        {
+	        using var stream = new StreamReader("token.txt");
+	        return await stream.ReadToEndAsync();
+        }
+
         public async Task MainAsync()
         {
             _ = await CharacterManager.InitCharacterManagerAsync(config);
@@ -35,11 +41,7 @@ namespace SilverHand
             client.Log += Log;
             commands.Log += Log;
 
-            string token;
-            using (var stream = new StreamReader("token.txt"))
-            {
-	            token = await stream.ReadToEndAsync();
-            }
+            var token = await GetTokenAsync();
 
             var cmd = new CommandHandler(client, commands);
             await cmd.InstallCommandsAsync();
